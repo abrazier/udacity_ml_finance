@@ -1,30 +1,60 @@
-import os
 import pandas as pd
+import matplotlib.pyplot as plt
 
-def get_data(symbols, dates):
-    df = pd.DataFrame(index=dates)
-    if 'SPY' not in symbols:
-        symbols.insert(0, 'SPY')
+#read in csv, plot both the close and adjusted close prices
+"""
+def test_run():
+    df = pd.read_csv("AAPL.csv")
+    df[['Close', 'Adj Close']].plot()
+    plt.show()
+"""
 
+#read in csv, print head, tail, rows 10-20, max close value, and mean of volume
+"""
+def test_run():
+    df = pd.read_csv("AAPL.csv")
+    print(df.head())
+    print(df.tail())
+    print(df[10:21])
+    print(df['Close'].max())
+    print(df['Volume'].mean())
+"""
+
+#declare empty df with indexes of dates
+"""
+def test_run():
+    start_date = '2010-01-22'
+    end_date = '2010-01-26'
+    dates = pd.date_range(start_date,end_date)
+    df1 = pd.DataFrame(index=dates)
+    print(df1)
+"""
+
+#join dfs
+def test_run():
+    start_date = '2010-01-22'
+    end_date = '2010-01-26'
+    dates = pd.date_range(start_date,end_date)
+
+    #declare empty df with index = dates
+    df1 = pd.DataFrame(index=dates)
+
+    #read SPY data in
+    dfSPY = pd.read_csv("SPY.csv", index_col="Date", parse_dates=True, usecols=['Date', 'Adj Close'], na_values=['nan'])
+    dfSPY = dfSPY.rename(columns={'Adj Close':'SPY'})
+
+    #join the empty df and SPY df using DataFrame.join() - inner to only keep records that appear in both
+    df1 = df1.join(dfSPY, how = 'inner')
+
+    symbols = ['GOOG', 'IBM', 'GLD']
     for symbol in symbols:
         df_temp = pd.read_csv("{}.csv".format(symbol), index_col='Date', parse_dates=True, usecols = ['Date', 'Adj Close'], na_values=['nan'])
         df_temp = df_temp.rename(columns = {'Adj Close' : symbol})
-        df = df.join(df_temp)
-        if symbol == 'SPY':
-            df = df.dropna(subset=["SPY"])
+        df1 = df1.join(df_temp)
 
-    return df
 
-def test_run():
-    dates = pd.date_range('2010-01-01', '2010-12-31')
-    symbols = ['GOOG', 'IBM', 'GLD']
-    df = get_data(symbols, dates)
-    #print(df)
-    #print(df.loc['2010-01-01':'2010-01-31']) #slice rows between 2 dates - note df.ix is depreciated use df.loc
-    #slice by column (symbols)
-    #print(df['GOOG']) #print only one col
-    #print(df[['IBM', 'GLD']]) #print multiple cols
-    print(df.loc['2010-01-01':'2010-01-31', ['SPY', 'IBM']]) #print SPY and IBM for only jan 2010
+    print(df1)
+
 if __name__ == "__main__":
     test_run()
         
